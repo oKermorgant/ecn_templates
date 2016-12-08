@@ -1,9 +1,22 @@
-Beamer and report Latex/Word templates for ARIA-ROBA and EMARO defenses
+## Reports
 
-Modify the file "thesisfront.tex" to set your name, thesis, jury, date, etc.
-Same for the bibliography report/defense, add it in the front page if needed.
+Latex (`report` folder) and Word (`word` folder) are available.
 
-Feel free to modify and propose any improvements.
+For Latex, modify the file `thesisfront.tex` to set your name, thesis, jury, date, etc.
+
+For the bibliography reports, change 'Master Thesis Report' to 'Thesis bibliography report'.
+
+## Presentations
+
+A beamer template is available in the `beamer` folder. No template for Powerpoint at this time.
+
+## Latex syntax example
+
+In the `ieeeexample` folder is the full tex file of a IEEE article with the corresponding PDF.
+
+It will not fully compile on your computer as the figures are not included, but you can find many examples of syntaxes: equations, tables, algorithms, figures and multiple figures.
 
 
 
+
+Feel free to modify the templates and suggest any improvements.
