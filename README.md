@@ -1,10 +1,9 @@
 ## Report
 
-Latex (`report` folder) and work (`word` folder) are available.
+Latex (`report` folder) and Word (`word` folder) are available.
 
 For Latex, modify the file `thesisfront.tex` to set your name, thesis, jury, date, etc.
-Same for the bibliography report/defense, add it in the front page if needed.
-
+Same for the bibliography report/defense, specify 'bibliography' if needed.
 ## Presentation
 
 A beamer template is available in the `beamer` folder.
