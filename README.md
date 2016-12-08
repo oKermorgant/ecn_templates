@@ -1,4 +1,4 @@
-## Report
+## Reports
 
 Latex (`report` folder) and Word (`word` folder) are available.
 
