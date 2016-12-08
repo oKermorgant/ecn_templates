@@ -1,0 +1,534 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+
+\documentclass[letterpaper, 10 pt, conference]{IEEEtran}  % if you need a4paper
+\makeatletter
+\def\endfigure{\end@float}
+\def\endtable{\end@float}
+\makeatother
+
+\IEEEoverridecommandlockouts                              % This command is only
+                                                          % needed if you want to
+                                                          % use the \thanks command
+\overrideIEEEmargins
+
+\usepackage[utf8]{inputenc}
+\usepackage[caption=false]{subfig}
+% \usepackage{enumitem}
+\usepackage{ok_abrv}
+
+\graphicspath{{\string~/Results/area/}}
+
+ \title{\LARGE \bf Partial visibility constraint in 3D visual servoing}
+
+\def\hth{\hspace{1.4pt}}
+\author{Olivier Kermorgant
+  \thanks{Olivier Kermorgant is with the ICube laboratory, Université de Strasbourg, Strasbourg, France.\newline
+	E-mail: {\tt\small kermorgant@unistra.fr}}
+}
+
+\begin{document}
+
+\maketitle
+
+\thispagestyle{empty}
+\pagestyle{empty}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+In this paper we address the problem of visibility in position-based visual servoing.
+It is well known that the observed object may leave the field of view in such schemes, as there is usually no control in the image.
+Recent control schemes try to cope with this issue by defining an image-based constraint such that the object stays in the image.
+We propose to increase the convergence domain of such schemes by defining a new constraint that allows the observed object to leave partially the field of view. 
+The general formulation is exposed and the computation of this constraint is detailed.
+Experiments show that controlling the visibility loss allows performing position-based visual servoing tasks that were impossible to perform while keeping the whole object in the image. 
+\end{abstract}
+\begin{keywords}
+  Visual servoing, visibility constraint, visual tracking
+\end{keywords}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-
+\section{Introduction}
+
+The definition of visual servoing is to control a robot by using features extracted from the image of a camera.
+If the corresponding interaction matrix is correctly estimated \cite{2006_mra_chaumette} then the chosen visual features will usually converge to their desired values with an exponential decrease of the error.
+The main concern is about the actual trajectory of the robot. Indeed, depending on the visual features that are used, the corresponding 3D trajectory may be very satisfactory and predictable (such as a straight 3D line from the initial to the desired position) or quite unpredictable if the visual features are not suited for the task that the robot has to perform. 
+
+The two classical classes of visual features have opposite approaches to this issue.
+Image-based visual servoing (IBVS) consists in using only 2D geometric features from the image. The goal is thus to find 2D features that have good properties in terms of induced 3D trajectory. For instance it is known that using the Cartesian coordinates of 2D points is not suited when large rotational motions around the optical axis of the camera are involved.
+On the opposite, position-based visual servoing  (PBVS) schemes use the image to retrieve 3D information on the robot position. Is it then possible to get nice 3D trajectories, but the observed object may leave the field of view during the task as the control is not performed in the image anymore.
+
+In this paper we focus on PBVS and propose a framework that improves current methods to keep the object in sight while trying to follow a straight 3D line. The main existing approaches are detailed and classified in \Sec{sec:pbvs}.
+We then propose a new formulation that allows the observed object to leave partially the field of view. 
+The corresponding criterion is called the partial visibility constraint. It consists in controlling the object visible area in the image, which is less restrictive than keeping the whole object visible. This criterion is detailed in \Sec{sec:partial} with the corresponding control law.
+Finally, experiments show that controlling the visibility loss allows performing position-based tasks that were impossible to perform while keeping the entire object in the image.
+
+%
+%A main issue in visual servoing is the choice of the set of visual features.
+%Indeed, contrary to classical sensors such as laser range sensors or robot encoders, cameras deliver high-dimensional data that need to be processed in order to obtain information about the robot environment.
+%Visual servo are classically divided in two main approaches \cite{2006_mra_chaumette}.
+%Image-based visual servoing (IBVS) focus on using geometric features that can be directly obtained from the image.
+%When used with a teaching-by-showing to specify the desired robot pose, these schemes are known to be robust to calibration and model errors.
+%The main drawback is that the induced 3D trajectory is not predictable and may be unsatisfactory.
+%Also, jacobian singularities or local minima may exist \cite{Chaumette98}.
+%% fin IBVS -> PBVS
+%On the opposite, position-based visual servoing (PBVS) uses the 3D pose of the camera as visual features and is globally asymptotically stable when the pose is assumed to be perfectly estimated.
+%Additional information such as true camera parameters and a 3D model of the observed object are necessary to estimate the camera pose from the acquired images.
+%For some PBVS schemes, the induced 3D trajectory is a 3D straight line, but there is no control in the image space and the object may get out of the field of view (FoV).
+%Another design of PBVS does not lead to a straight line but implicitly ensures that the object reference point stays in the image \cite{thuilot2002position}.
+%% fin PBVS pur -> 2 1/2
+%A similar approach is called 2 1/2D VS, where some of the 3D features are replaced by 2D information, leading to a set of 6 features that allow analytical proof of convergence and study the sensibility to calibration errors.
+%Popular choices are to use 2D coordinates of an image point together with 3D translation (resp. rotation) along the $z$-axis and the whole vector for 3D rotation (resp. translation) \cite{1999_itra_malis}.
+%This strategy ensures the reference point stays in the image, yet the object may partially leave the FoV.
+%In \cite{morel2000explicit} another 6-feature-set is designed to cope the visibility issue: 2D coordinates and 3D rotation together with the radius of the circumcircle of the object projection.
+%Yet, this shape may not be suited for all 3D objects, and a planning strategy must be done in the general case.
+%% fin 2 1/2 D -> hybrid
+%When using more than 6 features, merging 2D and 3D information leads to various hybrid approaches.~% trying to improve both the behavior both in the image space and in the 3D trajectory.
+%In \cite{chesi2004keeping}, PBVS translational and rotational motion are switched when the image points are near to the border. The goal is to perform only the 3D motion that will keep the points in the image.
+%Isolating the $z$-axis is also considered in \cite{corke2001new} with a partitioned strategy.
+%In practice, this leads to backward translational motions which is not an optimal 3D trajectory.
+%In \cite{gans2007stable}, a switching between IBVS and PBVS is proposed.
+%A maximum error is defined for each scheme, that makes the system switch to IBVS (resp. PBVS) if the 2D (resp. 3D) error norm is too high.
+%% However using the 2D error norm instead of the smallest distance between the observed object and the border 
+%However the maximum acceptable 2D error may be difficult to define% for the visibility constraint as it depends on the number of point features and on their relative positions
+%: if too high, a point may be able to reach the image border. If too small the scheme may stay in IBVS mode.
+%% 
+%% a small 2D error does not prevent one point from being near to the image border.
+%Finally, a hybrid control law has been proposed in \cite{hafez2007visual} with a 5D-objective function that allows determining the best weighting between IBVS and PBVS.
+%Once again, the tuning may be difficult in practice and does not ensure the visibility because the 2D weights are bounded.
+%To cope with partial visibility lost, a scheme has been proposed in \cite{garcia2005continuous} where the features can be continuously added and removed from the task when they enter or get out of the field of view.
+%As a point is approaching the image border, its participation in the control law is decreasing and becomes null before it is no more visible.
+%Still, the number of observed points must be enough to perform the pose estimation.
+%Our work is part of the hybrid approaches that let PBVS keep the points in sight. The main idea is to modify the PBVS as little as possible since this scheme provides nice 3D trajectories.
+%To do so, we choose the opposite approach of \cite{garcia2005continuous}:
+%instead of not taking into account the points that are about to leave the field of view, we inject them into the control law so that they stay in the image.
+%Contrary to previous hybrid schemes, all point coordinates are treated separately depending on their distance to the image border.
+%% The varying-feature-set framework \cite{Mansard09b} allows for such a continuous adding and removing of 2D visual features in a PBVS scheme.
+%First, visual servoing classical control laws are recalled.
+%In \Sec{sec:hyb} we expose the proposed hybrid scheme and we proof the local stability. We also consider particular issues due to discretization.
+%Finally, we compare our approach to other popular schemes in both simulations and experiments.
+
+\section{3D visual servoing and visibility}\label{sec:pbvs}
+
+In this section we recall the behavior of classical PBVS schemes and detail the main approaches to the visibility issue.
+
+\subsection{Position-based visual servoing}
+
+Visual servoing schemes consist in defining a robot task by an error function to be minimized:
+\begin{equation}\label{vs:error}
+ \e = \s - \sd
+\end{equation}where $\s$ is a vector of $m$ visual features with $\sd$ being their desired values. In the following, we assume $m\ge6$.
+Once the visual features have been chosen, the time variation of $\s$ is directly related to the camera velocity screw $\v$ by:
+\begin{equation}\label{vs:dots}
+ \dot\s = \dot\e = \Ls \v
+\end{equation}where $\Ls$ is the interaction matrix related to $\s$ and can usually be computed analytically \cite{2006_mra_chaumette}.
+Assuming the robot can be controlled with the camera velocity, \eqref{vs:dots} leads to the following control law:
+\begin{equation}\label{vs:law}
+ \v = -\lambda \LsP \e
+\end{equation}where $\LsP$ is an estimation of the Moore-Penrose pseudo-inverse of $\Ls$, that ensures at best that the error $\e$ is exponentially minimized in terms of euclidean norm.
+
+\def\t{\mathbf{t}}
+\def\thu{\theta\mathbf{u}}
+Position-based visual servoing consists in using directly the 3D pose (position and orientation)  of the camera as visual features \cite{wilson2002relative}. This scheme is known to be globally asymptotically stable if the pose is sufficiently well estimated.
+
+The main advantage is that the decrease of the error \eqref{vs:error} induces a 3D straight line trajectory of the end-effector, which is of course a predictable and very satisfactory behavior.
+Computer vision methods are used to retrieve the 3D pose of the camera. If a CAD model of the object is known, tracking the edges of the object \cite{Comport05b, drummond2002real} is a popular pose estimation approach. 
+On the other hand, a model-free method has been presented in \cite{1999_itra_malis}, allowing for the homography estimation from a set of corresponding points.
+The pose matrix that transforms points from object frame to camera frame is an element of the group of rigid body transformations $SE(3)$ and can be written:
+\begin{equation}\label{pbvs:cMo}
+\Hom{c}{o} = \left[\begin{array}{cc} \Rot{c}{o} & \Transl{c}{o} \\ 0 & 1 \end{array}\right]
+\end{equation}where $\Rot{c}{o}\in SO(3)$ is a rotation matrix and $\Transl{c}{o}\inR{3}\empty$ is a translation vector.
+
+In order to draw a 3D straight line, the 3D features have to be chosen as :
+\begin{equation}\label{pbvs:cdTc}
+\s=(\Transl{c*}{c},\ThetaU{c*}{c})
+\end{equation}where $\Transl{c*}{c}$ expresses the 3D translation and $\ThetaU{c*}{c}$ expresses the angle and the axis of the 3D rotation that the robot has to achieve. The corresponding interaction matrix is bloc-diagonal, inducing decoupled translational and rotational motions.
+The main drawback of such a PBVS is that there is no control at all in the image (actually, the observed object frame does not appear at all in the features \eqref{pbvs:cdTc}). The observed object can thus leave the field of view (FoV), which of course would result in the task not being performed. We now summarize the main approaches to this issue.
+
+\subsection{Classical approaches}
+
+Several different approaches have been proposed to improve PBVS with regards to the visibility issue.
+They consist in choosing slightly different 3D features, relying on partitioned or switching systems, or directly taking the visibility constraint into account.
+
+\subsubsection{Better 3D features}
+Instead of using the 3D features \eqref{pbvs:cdTc}, another popular choice is $\s=(\Transl{c}{o},\ThetaU{c*}{c})$ where $\Transl{c}{o}$ expresses the translation between the camera and the observed object frame. The corresponding interaction matrix is bloc-diagonal, and the resulting control law is globally asymptotically stable and ensures that the reference point of the object frame draws a straight line trajectory in the image.
+Similarly, in 2 1/2 visual servoing \cite{1999_itra_malis}, some of the 3D features are replaced by 2D information, leading to a set of 6 features that allow analytical proof of convergence and study the sensibility to calibration errors.
+Popular choices are to use 2D coordinates of an image point together with 3D translation (respectively rotation) along the $z$-axis and the whole vector for 3D rotation (respectively translation). In this case, the chosen image point (typically the centroid of the observed object) draws a straight line in the image.
+Yet, the induced trajectory of the end-effector is not a straight line anymore, the object may partially leave the FoV and no control is done on the reliability of the tracking with regards to the sole visible part of the object.
+Finally, in \cite{morel2000explicit} another 6-feature-set is designed to cope the visibility issue: 2D coordinates and 3D rotation together with the radius of the circumcircle of the object projection.
+Yet, this shape may not be suited for all 3D objects, and a planning scheme must be used in the general case.
+
+\subsubsection{Partitioned and switching systems}
+
+In \cite{chesi2004keeping}, PBVS translational and rotational motion are switched when the image points are near to the border. The goal is to perform only the 3D motion that will keep the points in the image.
+Isolating the $z$-axis is also considered in \cite{corke2001new} with a partitioned strategy.
+In practice, this leads to backward translational motions which is not an optimal 3D trajectory.
+In \cite{gans2007stable}, a switching between IBVS and PBVS is proposed.
+A maximum error is defined for each scheme, that makes the system switch to IBVS (resp. PBVS) if the 2D (resp. 3D) error norm is too high.
+% However using the 2D error norm instead of the smallest distance between the observed object and the border 
+However the maximum acceptable 2D error may be difficult to define% for the visibility constraint as it depends on the number of point features and on their relative positions
+: if too high, a point may be able to reach the image border. If too small the scheme may stay in IBVS mode.
+Similarly, a hybrid control law has been proposed in \cite{hafez2007visual} with a 5D-objective function that allows determining the best weighting between IBVS and PBVS.
+Once again, the tuning may be difficult in practice and does not ensure the visibility because the 2D weights are bounded.
+
+\subsubsection{Constrained visual servoing schemes}
+
+The visibility can also be seen as a constraint to be ensured while performing the PBVS. 
+As PBVS schemes are rank 6, classical avoidance approaches such as Gradient Projection Method (GPM) \cite{yoshikawa1996basic} are usually not suited in this case.
+In \cite{Kermorgant11b} we have proposed a hybrid approach that tries to perform a PBVS but that adds 2D information when some parts of the object are about to leave the FoV. The induced end-effector trajectory is as near as possible to a straight line, with only the minimal changes allowing for the visibility.
+The framework of cascaded quatradic programming (QP) \cite{kanoun2010kinematic} could also be used to model the visibility as a constraint.
+These approaches ensure the object is always entirely visible in the image. Paradoxically this may also be seen as a too important constraint that may prevent the system from reaching its desired position. Indeed, the tracking can usually be performed even if some parts of the object are out of the FoV, as long as enough of the object is visible.
+
+%
+%
+%On the other hand, the camera trajectory does not follow a 3D straight line as soon as a rotational motion has to be performed.
+%When the reference point is in the center of the object this scheme is very similar to 2 1/2D VS \cite{1999_itra_malis}.
+%However, even if one point is ensured to stay in the image, nothing can be said for the other points or visual elements used in the pose estimation.
+%Visibility is improved in \cite{morel2000explicit} but problems still remain depending on the object shape and the camera pose.
+%In the following
+%%we assume a CAD model of the object is known and that the camera pose $\Hom{c}{o}$ can be estimated. T
+%the interaction matrix of the PBVS scheme is denoted $\Lpb$.
+
+
+\section{Partial visibility}\label{sec:partial}
+
+
+In our approach we rely on the constrained control formalism. However, compared to previous works \cite{Kermorgant11b} we do not define the constraint as keeping the whole object in the FoV. Here, the constraint is just to keep a sufficient part of the object in the FoV.
+The corresponding visual feature, that we call the visibility ratio, is defined in this section together with its interaction matrix.
+We assume a 3D object is being observed. We denote $a$ the area of the projection of the object in the whole image plane, and $a_v$ the area of the projection of the object in the actual image (see \Fig{fig:poly}). The visibility ratio is defined as :
+\begin{equation}\label{def:ratio}
+r = \frac{a_v}{a}
+\end{equation}
+\begin{figure}\centering
+\includegraphics[width=.5\linewidth]{fig/visi}
+\caption{Whole area (large red polygon) and visible area (small green polygon) of the 3D object projection in the image plane.
+While all points of the red polygon belong to the object ($P_i$), the green polygon may involve intersection points ($I_i$) and corner points ($C_i$). }
+\label{fig:poly}
+\end{figure}
+$r$ is of course equal to 1 if the object is entirely visible, and equal to 0 if the object is entirely out of the FoV.
+The partial visibility constraint consists in imposing a lower bound $r_{\text{min}}$ for $r$, which will be considered as a constraint during the control law.
+In order to ensure at best an exponential decrease of the PBVS error, such a control law can be written \cite{kanoun2010kinematic}:
+\begin{equation}\label{def:law}
+\begin{array}{lc} \v = & \argmin \norm{\L_s\v + \lambda\e} \\
+								& \text{s.t.  }  r \geq r_{\text{min}}
+								\end{array}
+\end{equation}where $\v$ is the camera velocity screw and $\lambda$ is the control gain. $\L_s$ and $\e$ refer to the position-based visual task.\\
+$r_{\text{min}}$ is the minimum acceptable value for the visibility ratio. It may be a given percentage, or depend on the current visual tracking confidence.
+An efficient way to take such  constraint into account is to transpose it to a constraint on $\dot r$:
+\begin{equation}\label{def:kincont}
+\dot r \geq \alpha(r-r_{\text{min}})
+\end{equation}
+where $\alpha>0$ tunes the constraint. It is easily shown that if \eqref{def:kincont} is verified then $r \geq r_{\text{min}}$ at all time.
+The control law thus involves the time variation of $r$, which is linked to $\v$ through its interaction matrix $\L_r$.
+From \eqref{def:ratio}, $\L_r$ yields:
+\begin{equation}\label{def:Lr}
+\L_r = \frac{1}{a}\L_v - \frac{a_v}{a^2}\L_a
+\end{equation}where $\L_v$ and $\L_a$ are the interaction matrices of the visible area $a_v$ and of the whole area $a$.
+To be performed, the control law \eqref{def:law} thus requires the knowledge of $a$ and $a_v$ together with their interaction matrices.
+We now expose the proposed formulation, before going into computational details.
+
+
+
+\subsection{General formulation}
+
+In the sequel we assume the knowledge of the 3D points corresponding to the object 3D envelop. This is typically the case when an object is tracked with a CAD model, which is a common situation in PBVS.
+If the camera pose $\cMo$ is known, then the points defining the 3D envelop can be expressed in the image as 2D virtual points.
+Indeed, denoting ${}^o\X$ the coordinates of a 3D point in the object frame, the corresponding coordinates ${}^c\X=(X,Y,Z)$ in the camera frame yield:
+\begin{equation}
+{}^c\X = \cMo{}^o\X
+\end{equation}
+and 2D coordinates can then be expressed by:
+\begin{equation}\label{def:projection}
+\left\{\begin{array}{l}
+x = X/Z \\
+y = Y/Z
+\end{array}\right.
+\end{equation}
+As shown in \Fig{fig:poly}, the polygon corresponding to the whole area $a$ is called the large polygon. Similarly, the polygon corresponding to the visible area $a_v$ is called the small polygon.
+
+We use Green's theorem that allows computing the area of any polygon defined with the points $(x_i,y_i)$, $i\in[1,n]$, sequenced counterclockwise \cite{steger1996calculation}.
+In this case, the area can be expressed as:
+\begin{equation}\label{def:area}
+a = \frac{1}{2}\sum_{i=1}^{n}{x_{i-1} y_i - x_i y_{i-1}}
+\end{equation}with $(x_0,y_0) = (x_n,y_n)$. For readability reasons, and as we are only interested in the area ratio \eqref{def:ratio}, the factor $\frac{1}{2}$ is ignored in the sequel.
+From \eqref{def:area}, the time variation of $a$ yields:
+
+\begin{align}
+\dot a &= \sum_{i=0}^{n}{\dot x_{i-1} y_i + x_{i-1}\dot y_i -\dot x_i y_{i-1}} - x_i\dot y_{i-1} \\
+& = \sum_{i=0}^{n}{
+\left[\!\begin{array}{cc}y_i \!&\! -x_i\!\end{array}\!\right]
+\left[\!\begin{array}{c}\dot x_{i-1} \\ \dot y_{i-1}\end{array}\!\right]
+- \left[\!\begin{array}{cc}\!y_{i-1} \!&\! -x_{i-1}\!\end{array}\!\right]
+\left[\!\begin{array}{c}\dot x_i \\ \dot y_i\end{array}\!\right]}
+\end{align}
+The corresponding interaction matrix $\L_a$ can thus be expressed as:
+\begin{equation}\label{def:La}
+\L_a = \sum_{i=1}^{n} \R_i\L_{i-1} - \R_{i-1}\L_i
+\end{equation}where $\R_i = \left[\begin{array}{cc}y_i & -x_i\end{array}\right]$ and $\L_i$ is the well-known interaction matrix of the 2D image point $(x_i,y_i)$ \cite{2006_mra_chaumette}.
+
+\begin{figure*}\centering
+\subfloat[Initial segment $P_6P_1$]{\label{fig:areas:a}\includegraphics[width=.22\linewidth]{fig/visi1}}\hfil
+\subfloat[Segment $P_1P_2$ adds $I_1$]{\label{fig:areas:b}\includegraphics[width=.22\linewidth]{fig/visi2}}\hfil
+\subfloat[Segment $P_2P_3$ adds $I_2$ and $I_3$]{\label{fig:areas:c}\includegraphics[width=.22\linewidth]{fig/visi3}}\hfil
+\subfloat[Segment $P_5P_6$ adds  $C_1$, $I_4$ and $P_6$]{\label{fig:areas:d}\includegraphics[width=.22\linewidth]{fig/visi4}}
+\caption{Sequence followed to find the small polygon. Several configurations may exists depending on the segments crossing the image borders.}
+\label{fig:areas}
+\end{figure*}
+
+Hence, the partial visibility ratio \eqref{def:ratio} and the interaction matrix \eqref{def:Lr} can be computed as soon as 
+the vertices defining the large and the small polygon have been determined, together with their interaction matrices.
+
+At each iteration, the first step is thus to determine the sequence of points that corresponds to the large polygon. A simple algorithm to do so is to initialize the sequence with the point that is the most far from the centroid, as this point necessarily belongs to the contour. The following points are then added counterclockwise until the initial point is found again.
+From \eqref{def:area} the computation of the whole area $a$ is then straightforward. Similarly, from \eqref{def:La} the interaction matrix $\L_a$ can be computed.
+The visible area $a_v$ and its interaction matrix $\L_v$ are more complex to compute. Indeed, as shown in \Fig{fig:poly}, the small polygon is defined by a sequence of points that may involve intersection points between the image borders and the object 2D envelop, and corner points that are simply the corners of the image. We now detail the corresponding algorithm and computation.
+
+
+\subsection{Determining the visible area}
+
+In this section we first expose how to retrieve the sequence of points corresponding to the small polygon. 
+The computation of the visible area $a_v$ and its interaction matrix $\L_v$ are then presented.
+
+
+
+\paragraph{Finding the small polygon}
+
+From the large polygon $(P_1, \hdots, P_n)$, \Alg{algo:smallpoly} exposes the retrieving of the small polygon sequence. 
+We assume that the point $P_0 = P_n$ is visible, which can always be ensured by choosing another starting point for the sequence.
+If no points are visible, other 3D points can be defined along the envelop. 
+
+
+\begin{algorithm}[!t]
+\SetKwComment{Comment}{(}{)}
+% \SetAlgoLined
+\KwData {Large polygon $(P_0=P_n,P_1, \hdots, P_n)$}
+\KwResult {Small polygon $\mathcal{P}_s$}
+%add $P_0$ to $\mathcal{P}_s$\;
+$\mathcal{P}_s \gets P_0$\;
+inside $\gets$ true\;
+\For{$i\in[1,n]$}{
+\eIf{inside}{
+\eIf{$P_i$ is visible}{
+	add $P_i$ to $\mathcal{P}_s$\;
+	}
+{
+	find intersection $I_{\text{out}}$ of $[P_{i-1}P_i]$ with the image sides\;
+	store the side $S_{\text{out}}$ that has been crossed\;
+	add $I_{\text{out}}$ to $\mathcal{P}_s$\;
+	inside $\gets$ false\;
+	}
+}{
+\eIf{$P_i$ is visible}{
+find intersection $I_{\text{in}}$ of $[P_{i-1}P_i]$ with the image sides\;
+store the side $S_{\text{in}}$ that has been crossed\;
+\uIf{$S_{\text{out}} \ne S_{\text{in}}$}{
+add corners $C_i$ between $S_{\text{out}}$ and $S_{\text{in}}$\;
+}
+add $I_{\text{in}}$ to $\mathcal{P}_s$\;
+add $P_i$ to $\mathcal{P}_s$\;
+inside $\gets$ true\;
+}{
+check for intersections of $[P_{i-1}P_i]$ with the image sides\;
+\If{Found two intersections $I_{\text{in}}$ and $I_{\text{out}}$}{
+add potential corners as above\;
+add $I_{\text{in}}$ to $\mathcal{P}_s$\;
+add $I_{\text{out}}$ to $\mathcal{P}_s$\;
+store the last crossed side as $S_{\text{out}}$
+}
+}
+}
+}
+\caption{Get the sequence of points defining the small polygon.}
+\label{algo:smallpoly}
+\end{algorithm}
+
+
+The algorithm behavior is illustrated on \Fig{fig:areas}. Starting from $P_0=P_6$, the next point $P_1$ is visible, hence it is added to the polygon (\Fig{fig:areas:a}).
+$P_2$ is not visible, the intersection $I_1$ is thus computed and added to the polygon (\Fig{fig:areas:b}).
+$P_3$ is not visible either, but $[P_2P_3]$ has two intersections $I_2$ and $I_3$ with the image borders. They are added to the polygon (\Fig{fig:areas:c}).
+$P_4$ and $P_5$ are not visible, thus nothing happens for them.
+Since $P_6$ is visible, the intersection $I_4$ is computed. As it does not belong to the same side as $I_3$, the intermediary corner $C_1$ is first added to the polygon, then $I_4$ and finally $P_6$ (\Fig{fig:areas:d}).
+In the next section we expose the computation of the interactions matrices of the intersection points.
+
+\paragraph{Intersection interaction matrix}
+
+The corner points being motionless, their interaction matrix is null.
+To retrieve the interaction matrix of the intersection points, we actually need to compute the corresponding 3D intersection. Indeed, the sole 2D intersection would prevent from knowing the $Z$-depth that appears in the interaction matrix.
+Denoting $(\xMin,\xMax,\yMin,\yMax)$ the image limits, the
+borders correspond to the four 3D planes of equation:
+\begin{equation}
+X = \xMin Z,  \quad X = \xMax Z, \quad
+Y = \yMin Z,  \quad Y = \yMax Z
+\end{equation}We denote $aX+bY+cZ = \mathbf{U}^\top\X = 0$ 
+the equation of such a plane.
+Denoting $\X_1$ and $\X_2$ two 3D points, the 3D intersection $\mathbf{I}$ of $(\X_0\X_1)$ and a 3D plane yields:
+\begin{equation}\label{intersect:I}
+\mathbf{I} = \X_0 + k(\X_1-\X_0)
+\end{equation}
+with:
+\begin{equation}\label{intersect:k}
+%k = \frac{-(aX_0+bY_0+cZ_0)}{a(X_1-X_0)+b(Y_1-Y_0)+c(Z_1-Z_0)} = \frac{N}{D} 
+k = \frac{-\mathbf{U}^\top\X_0}{\mathbf{U}^\top(\X_1-\X_0)} = \frac{N}{D} 
+\end{equation}
+The intersection is considered valid only if $k\in[0,1]$, that is $\mathbf I \in [\X_0\X_1]$.
+From \eqref{intersect:I} and \eqref{intersect:k}, the interaction matrix $\L_{\text{3D}}$ of the 3D point $\mathbf{I}$ yields:
+\begin{align}
+\L_{\text{3D}} = & \L_0 - (\X_1-\X_0)
+\left(\frac
+{D\mathbf{U}^\top\L_0 + N\mathbf{U}^\top(\L_1 - \L_0)}
+{D^2}\right) \nonumber \\
+&+ k(\L_1-\L_0)
+\end{align}with $\L_0$ and $\L_1$ being the interactions matrices of the 3D points $\X_0$ and $\X_1$.
+$\L_{\text{3D}}$ is thus known and verifies:
+\begin{equation}\label{inter:3D}
+\dot{\mathbf{I}} = (\dot X, \dot Y, \dot Z) = \L_{\text{3D}} \v
+\end{equation}
+
+The image coordinates $(x,y)$ of the 2D intersection can be expressed from \eqref{def:projection} and \eqref{intersect:I}.
+Their derivative are related to the 3D coordinates derivative:
+\begin{equation}\label{inter:2D3D}
+\left[\begin{array}{c} \dot x \\ \dot y\end{array}\right] = \left[\begin{array}{ccc}1/Z & 0 & -x/Z \\ 0 & 1/Z & -y/Z \end{array}\right]
+\left[\begin{array}{c} \dot X \\ \dot Y \\ \dot Z\end{array}\right]
+\end{equation}
+
+Finally, from \eqref{inter:3D} and \eqref{inter:2D3D}, the interaction matrix $\L_I$ of the 2D intersection $(x,y)$ can be expressed with:
+\begin{equation}
+\L_I = \left[\begin{array}{ccc}1/Z & 0 & -x/Z \\ 0 & 1/Z & -y/Z \end{array}\right]\L_{\text{3D}}
+\end{equation}
+
+The coordinates and the interaction matrices of the points defining both the large and the small polygons have been exposed, making it possible
+to compute the visibility ratio \eqref{def:ratio}, and its interaction matrix from \eqref{def:Lr} and \eqref{def:La}.
+We now detail the control law that ensures the partial visibility.
+
+\subsection{Control law}
+
+\begin{figure*}
+\subfloat[Normalized joint positions]{\label{fig:full:joint}\includegraphics[width=2.2\widthThree]{afma1_3D_2D_q}}\hfill
+\subfloat[Final position: the object is about to leave the image]{\label{fig:full:img}\includegraphics[width=2\widthThree]{afma1_3D_2D/image00743}}\hfill
+\subfloat[Position error]{\label{fig:full:err}\includegraphics[width=2.2\widthThree]{afma1_3D_2D_err3d}}
+\caption{Full visibility constraint. Both the joint limit (a) and the visibility constraint (b) are reached. The only solution is to stop the system and the position error stops decreasing (c).}
+\label{fig:full}
+\end{figure*}
+
+The control law \eqref{def:law} is expressed through the quadratic programming formalism with active sets \cite{kanoun2010kinematic}.
+First the unconstrained law is computed:
+\begin{equation}
+\v_1 = \argmin \norm{\L_s\v + \lambda\e} = -\lambda\L_s^+\e
+\end{equation}
+The partial visibility constraint is then checked:
+\begin{equation}\label{law:cond}
+\dot r = \L_r\v_1\stackrel{?}{\geq} \alpha(r-r_{\text{min}})
+\end{equation}
+If \eqref{law:cond} is verified then $\v_1$ is applied on the system.
+If not, the constraint is changed to equality and the following optimization problem is considered:
+\begin{equation}\label{eq:law}
+\begin{array}{lc} \v = & \argmin \norm{\L_s\v + \lambda\e} \\
+								& \text{s.t.  }  \L_r\v = \alpha(r-r_{\text{min}})
+								\end{array}
+\end{equation}which can be solved through Lagrangian method.
+The joint limit constraint is considered with the same formalism. \\
+Experiments now illustrate the proposed approach.
+
+\section{Experiments}\label{sec:exp}
+
+In this section the proposed approach is exposed and compared to a visual servoing under full visibility constraint.
+Experiments are carried on a 6 DOFs gantry robot (see the video accompanying this paper).
+The camera and the robot are calibrated. The camera observes a mechanical object, the 3D model of which is known.
+The edges are tracked to allow for the pose estimation at camera rate \cite{Comport05b}. 
+The control law and tracking are performed using ViSP software \cite{Marchand05b}.
+
+\subsection{Full visibility constraint}
+
+%Compared to the experiments exposed in \cite{Kermorgant11b}, t
+The robot joint limits have been defined such that
+the visual servoing cannot be performed with the full visibility constraint. In this configuration, joint $q_1$ approximately corresponds to a backward motion of the camera. 
+This is represented in \Fig{fig:full}, where the final image (\Fig{fig:full:img}) shows the object is very near to the border. 
+The joint $q_1$ that would allow performing the servoing has already reached its limit as shown in \Fig{fig:full:joint} %\footnote{The figure represents the normalized joint positions, with their upper and lower limits.}.
+(normalized joint positions are represented).
+Consequently, the best solution is the null motion: the system stops as it is not possible anymore to minimize the position error without violating the constraints. The final position is thus the local minimum corresponding to the steepest gradient descent under the visibility and joint avoidance constraints.
+We now try to perform the same task with a partial visibility constraint.
+
+
+\subsection{Partial visibility constraint}
+
+The same experiment is carried, but this time the visibility constraint is to have at least $r_{\text{min}} = 90\%$ of the object visible. 
+The robot quickly reaches a configuration which is similar to the one previously shown in \Fig{fig:full:img} but this time the object is allowed to partially leave the FoV, as shown in \Fig{fig:part2:im1}.
+
+\Fig{fig:part2} represents camera images at iterations 200 (94\% visibility), 700 (90\%) and 1400 (98\%). The tracking is the same as before but only the small polygon is represented here, as in \Fig{fig:areas}. We can point out that the tracking still performs well in this configuration, although only 90\% of the object is visible (see the video accompanying this paper). The visibility ratio occasionally drops below 90\% because of the tracking noise but still stabilizes around the acceptable value.
+
+%The edge colors simply indicate the type of the edge: 
+%\begin{itemize}
+%\item fully visible (green) as $P_6P_1$
+%\item leaving (red) as $P_1P_2$
+%\item entering-and-leaving (orange) as $P_2P_3$
+%\item entering (blue) as $P_5P_6$
+%\end{itemize}
+
+At iteration 1400 (\Fig{fig:part2:im3}) the object is about to be fully visible again and the scheme is near from convergence.
+
+\Fig{fig:part1} shows the behavior of the proposed scheme. As in the full visibility case, joint 1 quickly reaches its limit as shown in \Fig{fig:part1:joint}.
+This time the robot does not have to stop, as a solution can be found by making the object partially leave the FoV. 
+\Fig{fig:part1:a} represents the partial visibility ratio that decreases very quickly below 96\%. 
+The lower bound of the visibility ratio is reached around iteration 700. Joint 1 is still laying on its limit, but this does not prevent the scheme from being performed.
+
+Once the low-visibility phase has been passed, the ratio starts to increase again and is equal to 1 (full visibility) a few iterations before convergence. 
+We can see that the object is entirely visible again around iteration 1500, while \Fig{fig:part1:err} shows the position error is becoming null at the same time. Most of the scheme thus performs while controlling the visibility loss.
+
+
+%The corresponding 3D trajectory is compared to the full visibility one in \Fig{fig:3d}. The trajectory of pure PBVS is also represented.
+%It appears that the partial visibility induces a trajectory that is between the two others. Under a less restictive constraint, the robot can stay better next to the ideal 3D straight line. This is sufficient to find a solution where the full visibility
+
+
+
+
+
+
+
+
+\section{Conclusions}
+
+A new approach has been proposed to cope with the visibility constraint in position-based visual servoing.
+Compared to previous approaches, we do allow the observed object to leave the FoV but the visibility loss is actively controlled.
+The approach shows that a CAD model of the observed object makes it possible to compute the interaction matrix of the partial visibility ratio and to ensure this value keeps above a given percentage.
+This leads to an improved 3D trajectory compared to schemes that keep the entire object in the FoV. As shown in the experiments, 
+controlling the visibility loss can also make a task possible, while there was no solution with the full visibility constraint.
+As the minimum visibility ratio $r_\text{min}$ is likely to depend on the model characteristics and may be difficult to define, a possible improvement is to take into account the visual tracking confidence in order to adapt the acceptable visibility ratio. This would typically be the case if there are not enough visible segments to track the observed object.
+
+
+\section{Acknowledgment}
+
+The author would like to acknowledge the Lagadic team at Inria Rennes for having made it possible to perform the experiments on the Afma6 robot.
+
+
+\begin{figure*}
+\subfloat[Image at iteration 200 (94\%)]{\label{fig:part2:im1}\includegraphics[width=2.1\widthThree]{afma1_3D_area/image00200}}\hfill
+\subfloat[Image at iteration 700 (90\%)]{\label{fig:part2:im2}\includegraphics[width=2.1\widthThree]{afma1_3D_area/image00727}}\hfill
+\subfloat[Image at iteration 1400 (98\%)]{\label{fig:part2:im3}\includegraphics[width=2.1\widthThree]{afma1_3D_area/image01400}}
+\caption{Partial visibility constraint. Camera images at iteration 200 (a), 700 (b) and 1400 (c). The object is partially out of the FoV and the visibility ratio reaches its minimum value in (b).}
+\label{fig:part2}
+\end{figure*}
+
+
+\begin{figure*}
+\subfloat[Normalized joint positions: joint 1 (blue) reaches its upper limit]{\label{fig:part1:joint}\includegraphics[width=2.1\widthThree]{afma1_3D_area_q}}\hfill
+\subfloat[Visibility ratio value]{\label{fig:part1:a}\includegraphics[width=2.1\widthThree]{afma1_3D_area_a2}}\hfill
+\subfloat[Position error]{\label{fig:part1:err}\includegraphics[width=2.1\widthThree]{afma1_3D_area_err3d}}
+\caption{Partial visibility constraint. Joint positions (a) reach the same limit, while the visibility ratio (b) stays above 90\%. This allows the position error to converge to 0 (c).}
+\label{fig:part1}
+\end{figure*}
+%
+%\begin{figure}\centering
+%\includegraphics[width=.8\linewidth]{full3d2}
+%\caption{3D trajectory of the camera with partial visibility (blue), full visibility (green) and pure PBVS (red). PBVS quickly stops as the object leaves the FoV. Full visibility also stops when no solution are found to minimize the error under the given constraints. The partial visibility scheme converges to the desired position. }
+%\label{fig:3d}
+%\end{figure}
+
+
+% \newpage
+\bibliographystyle{\string~/Travaux/zz_texinputs/IEEEtranS}
+% \vspace{-10mm}
+\bibliography{\string~/Travaux/zz_texinputs/IEEEabrv,\string~/Travaux/zz_texinputs/bib_Conf}
+\nocite{}
+\end{document}

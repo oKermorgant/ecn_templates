@@ -1,0 +1,511 @@
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+%\usepackage{slashbox}
+\usepackage{multirow}
+\usepackage{algorithm2e}
+\usepackage{theorem}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{topcapt}
+\usepackage{cellspace}
+%\usepackage[center]{caption}
+
+
+\newcommand{\newstuff}[1]{\textcolor{red}{\bf #1}}
+%\newcommand{\newstuff}[1]{#1}
+
+\newcommand{\msout}[1]{\text{\sout{\ensuremath{#1}}}}
+%\overfullrule=0pt
+%\hyphenpenalty=750
+\def\@df@check@empty#1#2{\ifx#1\empty\relax\else#2\fi}
+
+
+
+
+%\setlength\cellspacetoplimit{1mm}
+%\setlength\cellspacebottomlimit{1mm}
+
+
+
+% mes notations
+\DeclareRobustCommand\calib{calibration}
+\DeclareRobustCommand\lcalib{la calibration}
+\DeclareRobustCommand\calibd{\calib~}
+\DeclareRobustCommand\lcalibd{\lcalib~}
+\DeclareRobustCommand\ocite[1]{\small \textcolor{orange} {#1}}
+
+
+\DeclareRobustCommand\Eq[1]{(\ref{#1})}
+\DeclareRobustCommand\Sec[1]{Section \ref{#1}}
+\DeclareRobustCommand\Alg[1]{Algorithm \ref{#1}}
+\DeclareRobustCommand\Ann[1]{Annexe \ref{#1}}
+\DeclareRobustCommand\Fig[1]{Fig.~\ref{#1}}
+\DeclareRobustCommand\Figf[1]{Figure~\ref{#1}}
+\DeclareRobustCommand\FigLab[1]{\newline\centering{#1}}
+\def\iif{\emph{iif}~}
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+
+%\abovedisplayskip=2pt
+%\belowdisplayskip=2pt
+%\abovedisplayshortskip=2pt
+%\belowdisplayshortskip=2pt
+
+%place
+\def\vcap{\vspace{-0.8cm}}
+\def\vcapr{\vspace{-0.4cm}}
+\def\vfig{\vspace{-0.4cm}}
+\def\veq{\vspace{-.8cm}}
+
+\newlength{\widthTwo}
+\setlength\widthTwo{.48\linewidth}
+\newlength{\widthThree}
+\setlength\widthThree{.32\linewidth}
+\newlength{\widthFour}
+\setlength\widthFour{.40\linewidth}
+\newlength{\widthThreeCol}
+\setlength\widthThreeCol{.32\linewidth}
+\newlength{\widthDeux}
+\setlength\widthDeux{.5\linewidth}
+\newlength{\mywidth}
+\setlength\mywidth{\linewidth}
+% \def\widthThree{.32\linewidth}
+\def\newfig{\vspace{-8pt}\newline}
+%\setlength\abovedisplayskip{3pt}	% espace avant / apres equations
+%\setlength\belowdisplayskip{3pt}
+%% \setlength{\itemsep}{1pt}
+%\setlength{\parskip}{0pt}
+%\setlength{\parsep}{0pt}
+%% \setlength{\parindent}{0pt}
+%\setlength{\topskip}{0pt}	% itemize / enumerate
+%\setlength{\topsep}{0pt}	% titres de sections
+
+% raccourcis
+\def\hsp{\textrm{  }}
+\DeclareRobustCommand\Sensor{s}
+\DeclareRobustCommand\EndEff{e}
+\DeclareRobustCommand\Cam{c}
+\let\Robot\EndEff
+\let\Vehicle\EndEff
+
+\providecommand\IR{\mathbb{R}}%\let\setR\IR}
+\providecommand\II{\mathbb{I}}%\let\setI\II}
+\let\identity\II
+
+\DeclareRobustCommand\Pass[3]	{\@df@check@empty{#1}{{}^{#1}\hspace*{-1pt}}{#2}\@df@check@empty{#3}{_{\!#3}}}
+\DeclareRobustCommand\Frame[1]	{\Pass{\empty}{\mathcal{F}}{#1}}
+\DeclareRobustCommand\rot[2]	{\Pass{#1}{\mathbf{r}}{#2}}
+\DeclareRobustCommand\Rot[2] 	{\Pass{#1}{\mathbf{R}}{#2}}
+\DeclareRobustCommand\Hom[2]	{\Pass{#1}{\mathbf{M}}{#2}}
+\DeclareRobustCommand\Transl[2]	{\Pass{#1}{\mathbf{t}}{#2}}
+\DeclareRobustCommand\ThetaU[2]	{\Pass{#1}{\theta\mathbf{u}}{#2}}
+\DeclareRobustCommand\Twist[2] 	{\Pass{#1}{\mathbf{W}}{#2}}
+\DeclareRobustCommand\Jac[2] 	{\Pass{#1}{\mathbf{J}}{#2}}
+\DeclareRobustCommand\pose[2] 	{\Pass{#1}{\mathbf{p}}{#2}}
+
+\DeclareRobustCommand\norm[1] 	{\|{#1}\|}
+
+\def\plane{\mathcal{P}}
+\def\sFrame{\Frame\Sensor}
+\def\rFrame{\Frame\EndEff}
+\def\p{\mathbf{p}}
+\def\sWe{\Twist{\Sensor}{\EndEff}}
+\def\sMe{\Hom{\Sensor}{\EndEff}}
+\def\cMo{\Hom{c}{o}}
+\def\eWs{\Twist{\EndEff}{\Sensor}}
+\def\WW{\Twist\empty\EndEff}
+\def\Comb{\mathbf{C}}
+\def\CombDes{\mathbf{C}_*}
+\def\CombCur{\mathbf{C}_\text{cur}}
+\def\CombMean{\mathbf{C}_\frac{1}{2}}
+\def\CombMix{\mathbf{C}_\text{mix}}
+\def\CombVel{\mathbf{C}_\#}
+\def\K{\mathbf{K}}
+\def\H{\mathbf{H}}
+\def\tH{\tilde{\H}}
+\def\tG{\mathbf{G}}
+\def\L{\mathbf{L}}
+\def\R{\mathbf{R}}
+\def\Q{\mathbf{Q}}
+\def\A{\mathbf{A}}
+\def\M{\mathbf{M}}
+
+\DeclareRobustCommand\LInteraction[1][\empty]{\mathbf{L}\@df@check@empty{#1}{_{(#1)}}}
+\DeclareRobustCommand\Ls[1][\empty]{\mathbf{L}_{\Sensor{\@df@check@empty{#1}{#1}}}}
+\def\Ker{\text{Ker }}
+\def\eye{\text{ext}}
+\def\eyeI{\text{int}}
+
+% IBVS / PBVS
+\def\LsP{\widehat{\Ls}{\!\!}^+}
+\def\pb{{3d}}
+\def\ib{{2d}}
+\def\hyb{\text{hyb}}
+\def\Lpb{\LInteraction_\pb}
+\def\Lib{\LInteraction_\ib}
+\def\Hib{\H_\ib}
+\def\Hpb{\H_\pb}
+\def\eib{\e_\ib}
+\def\epb{\e_\pb}
+\def\PBVScTo{$\Transl{c}{o}$-PBVS}
+\def\PBVScdTc{$\Transl{c*}{c}$-PBVS}
+
+%  articulations
+\def\MG{M\!G}
+\def\MGINV{M\!G\!I\!N\!V}
+\def\Pe{\mathcal{P}}
+\def\u{\mathbf{u}}
+\def\U{\mathbf{U}}
+\def\S{\mathbf{S}}
+\def\q{\mathbf{q}}
+\def\qArt{\mathbf{q}}
+\def\qDot{\dot\qArt}
+\def\eJq{\Jac{\EndEff}q}
+\def\Js{\Jac{\empty}{s}}
+\def\Jp{\J^+}
+\def\Je{\widehat{\J}}
+\def\Jpe{\widehat{\J}^+}
+\def\Jsh{\widehat\J_s}
+\def\JsT{\widehat\J_s^\top}
+\def\JsP{\widehat\Js^+}
+\def\Jmean{\J_{\frac{1}{2}}}
+\DeclareRobustCommand\J[1][\empty]{\mathbf{J}{\@df@check@empty{#1}{_#1}}}
+\def\Hq{\H_\qArt}
+\def\JH{\Jac\empty\H}
+\def\qLim{q^{\text{lim}}}
+\def\qs{q^{\text{s}}}
+\def\qa{q^{\text{a}}}
+\def\hopt{h^{\text{opt}}}
+\def\hmin{h^{\text{min}}}
+\def\hinf{h^\infty}
+\def\xie{\xi(\norm{\e_t})}
+\def\sig{\text{sig}}
+\def\Dq{\mathbf{D}_\qArt}
+\def\rhoq{\rho_\qArt}
+\def\rhoa{\rho^\text{a}}
+
+\def\ibar{\msout{i}}
+\def\hconst{h^{t}}
+\def\hcontr{h^{c}}
+\def\hadapt{h^{\text{ad}}}
+
+\def\lMin{-}
+\def\lMax{+}
+\def\aMin{{\text{a}-}}
+\def\aMax{{\text{a}+}}
+\def\sMin{{\text{s}-}}
+\def\sMax{{\text{s}+}}
+
+\def\xMin{x^\lMin}
+\def\xMax{x^\lMax}
+\def\yMin{y^\lMin}
+\def\yMax{y^\lMax}
+\def\xsm{x^\sMin}
+\def\xsp{x^\sMax}
+\def\ysm{y^\sMin}
+\def\ysp{y^\sMax}
+\def\qLm{q^\lMin}
+\def\qLp{q^\lMax}
+\def\qsm{q^{\text{s}-}}
+\def\qsp{q^{\text{s}+}}
+\def\qam{q^{\text{a}-}}
+\def\qap{q^{\text{a}+}}
+\def\sLm{s^\lMin}
+\def\sLp{s^\lMax}
+\def\ssm{s^{\text{s}-}}
+\def\ssp{s^{\text{s}+}}
+\def\sam{s^{\text{a}-}}
+\def\sap{s^{\text{a}+}}
+\def\SafeI{\mathcal{S}}
+\def\I{\mathcal{I}}
+
+% \def\nsig{\overline{\text{sig}}}
+\DeclareRobustCommand\nsig[3]{\overline{\text{sig}}(#1,#2,#3)}
+
+
+\DeclareRobustCommand\dim[2] 	{(\!#1\!\times\!#2\!)}
+\DeclareRobustCommand\inR[2] 	{\in \IR^{#1\@df@check@empty{#2}{\!\times\!#2\!}}}
+
+% texte
+\def\adj{\text{adj}}
+\newcommand{\superscript}[1]{\ensuremath{^{\text{#1}}}~}
+\newcommand{\subscript}[1]{\ensuremath{_{\text{#1}}}~}
+\newcommand{\st}[0]{\superscript{st}}
+\newcommand{\nd}[0]{\superscript{nd}}
+\newcommand{\eme}[0]{\superscript{th}}
+\newcommand{\rd}[0]{\superscript{rd}}
+\newcommand{\emefr}[0]{\superscript{ème}}
+\newcommand{\ere}[0]{\superscript{ère}}
+
+
+% notations héritées de David
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% some command and macro
+
+% writing command/macro
+\providecommand\email[1]{{\tt\relsize{-.5}#1}}
+\providecommand\shortcite[1]{\cite{#1}}
+
+\def\@df@ceskip{\hskip-1pt}
+\providecommand\eg{{e.\@df@ceskip{}g.}}
+\providecommand\ie{{i.\@df@ceskip{}e.}}
+\providecommand\wrt{{wrt.~}}
+\providecommand\etal{{et al.}}
+\def\tobecontinued{{\relsize{-1}\bfseries{}[\ldots]}}
+
+
+%-------------------------------------------------------------------------------
+% math command/macro
+
+\DeclareRobustCommand\test[2]{{{}^{#1}\hspace*{-1pt}}\mathbf{W}_{\! #2}}
+\DeclareRobustCommand\jacobian[2]{\frac{\partial #1}{\partial #2}}
+\DeclareRobustCommand\diff[2]{\frac{\partial #1}{\partial #2}}
+\DeclareRobustCommand\JInt[1]{\frac{\partial#1}{\partial{\IntrinP}}}
+\DeclareRobustCommand\JExt[1]{\frac{\partial#1}{\partial{\ExtrinP}}}
+\providecommand\diag[1]{\text{Diag}(#1)}
+
+\DeclareRobustCommand\Norm[1]{\left\lVert#1\right\rVert^2}
+
+\DeclareRobustCommand\Estim[1]{\widehat{#1}}
+
+\DeclareRobustCommand\s{\mathbf{s}}
+\DeclareRobustCommand\sd{\mathbf{s}^*}
+\DeclareRobustCommand\edd{\dot{\mathbf{e}}^*}
+\DeclareRobustCommand\sensorData{\mathbf{s}}
+\let\visualData\sensorData
+\DeclareRobustCommand\zs{\mathbf{z}}
+
+\let\dfInteraction\LInteraction
+
+\def\vl{\boldsymbol{v}}
+\def\va{\boldsymbol{\omega}}
+
+\DeclareRobustCommand\LinV[1][\empty]{\boldsymbol{v}\@df@check@empty{#1}{_{\!#1}}}
+\DeclareRobustCommand\AngV[1][\empty]{\boldsymbol{\omega}\@df@check@empty{#1}{_{\!#1}}}
+\DeclareRobustCommand\dfScrew[1][\empty]{\mathbf{v}\@df@check@empty{#1}{_{\!#1}}}
+\let\Motion\dfScrew
+\let\Screw\dfScrew
+\def\sScrew{\dfScrew[\Sensor]}
+\def\camScrew{\dfScrew[c]}
+\def\rScrew{\dfScrew[\EndEff]}
+\def\w{\mathbf{w}}
+\def\v{\mathbf{v}}
+\def\x{\mathbf{x}}
+\def\X{\mathbf{X}}
+
+\DeclareRobustCommand\dfTensor[2][q]{\left\{#2\right\}_{\!#1}}
+\DeclareRobustCommand\dfTensorJ[1]{\left\{#1\right\}}
+\DeclareRobustCommand\dfTensorI[2]{\left\{{}_{\scriptscriptstyle\identity_{#2}\otimes}\hskip1pt#1\right\}}
+\DeclareRobustCommand\dfTensorV[2][\Sensor]{\dfTensorI{\dfScrew[#1]}{#2}}
+\DeclareRobustCommand\dfTensorL[1][\empty]{\left[\mathbf{L}\@df@check@empty{#1}{_{#1}}\right]}
+
+\DeclareRobustCommand\binomial[2]{\left(\begin{array}{@{\hspace{-.1em}}c@{\hspace{-.1em}}}\scriptstyle{#1}\\[-.166em]\scriptstyle{#2}\end{array}\right)}
+
+\DeclareRobustCommand\PreProd[1]{\left[{#1}\right]_{\times}}
+\let\skew\PreProd
+
+\def \mScrew{\Screw_{\bf{main}}}
+\def \cScrew{\Screw_{\bf{calib}}}
+\def\P{\mathbf{P}}
+\def\Jv{\J_{\Screw}}
+\def\Jq{\J_\q}
+\DeclareRobustCommand\Ji[1][\empty]{\J_\intrin\@df@check@empty{#1}{{}_{(#1)}}}
+
+\def\Ds{\mathbf{D}_\Sensor}
+\def\Hs{\mathbf{H}_\Sensor}
+\def\Hs{\mathbf{H}_t}
+\def\Jt{\J_t}
+\def\cont{\overline{\otimes}}
+
+\providecommand\Vx{{v_{\!x}}}
+\providecommand\Vy{{v_{\!y}}}
+\providecommand\Vz{{v_{\!z}}}
+\providecommand\Wx{{\omega_{\!x}}}
+\providecommand\Wy{{\omega_{\!y}}}
+\providecommand\Wz{{\omega_{\!z}}}
+\providecommand{\px}{\alpha_{x}}
+\providecommand{\py}{\alpha_{y}}
+\def\f{f_p}
+\def\MF{\mathbf{M}_F}
+
+
+\DeclareRobustCommand\Param{\mathbf{\xi}}
+\DeclareRobustCommand\Param{\boldsymbol{\xi}}
+
+\def\intrin{\text{in}}
+\def\extrin{\text{ex}}
+\DeclareRobustCommand\IntrinP{{\Param_\intrin}}
+\DeclareRobustCommand\ExtrinP{{\Param_\extrin}}
+\DeclareRobustCommand\dIntrinP{{\iter\Param_\intrin}}
+\DeclareRobustCommand\dExtrinP{{\iter\Param_\extrin}}
+
+\def\estLs{\Ls{}_{(\Estim\IntrinP)}}
+\def\estsWe{\sWe{}_{(\Estim\ExtrinP)}}
+
+\DeclareRobustCommand\ExR{{\Param_{\rot}}}\DeclareRobustCommand\exR{{\xi_{\rot}}}
+\DeclareRobustCommand\ExT{{\Param_{\Transl}}}\DeclareRobustCommand\exT{{\xi_{\Transl}}}
+
+\DeclareRobustCommand\JParam{\mathbf{J}}
+\DeclareRobustCommand\JP[1][\empty]{\JParam\@df@check@empty{#1}{_{(#1)}}}
+
+\DeclareRobustCommand\JExtT[1]{\frac{\partial#1}{\partial{\Transl}}}
+\DeclareRobustCommand\JExtU[1]{\frac{\partial#1}{\partial{\tu}}}
+
+\DeclareRobustCommand\Pix[1]{{#1}}
+\DeclareRobustCommand\Met[1]{{#1}}
+
+\DeclareRobustCommand\JXI[6]{%
+  \left(\begin{array}{@{\hspace{.1em}}cccccc@{\hspace{.1em}}}
+      #1&#2&#3&#4&#5&#6
+    \end{array}\right)
+}
+\DeclareRobustCommand\Tech{\Delta\!t}
+
+\def\xx{{\mathsf{\check{x_p}}}}
+\def\yy{{\mathsf{\check{y_p}}}}
+\def\Kd{\mathord{k_{\!d}} }
+\def\Kr{\mathord{\mathsf{r}}}
+\def\dfObjet{{{\mathcal{O}}}}
+\def\dfRegion{{\mathbf{R}}}
+
+\DeclareRobustCommand\dfTransf[1][\empty]{\mathbf{W}\@df@check@empty{#1}{_{(#1)}}}
+%\let\dfTransf
+
+\def\cRn{\Rot{\Sensor}\EndEff}
+\def\cTn{\Transl{\Sensor}\EndEff}
+\def\ScTn{\PreProd{\cTn}}
+\def\ST{\PreProd{\Transl}}
+
+\def\tx{t_{{x}}}
+\def\ty{t_{{y}}}
+\def\tz{t_{{z}}}
+\def\ThU{{\mathbf{u}}}
+\def\tu{\mathbf{\theta}{\!\ThU}}
+\def\ux{u_{{x}}}
+\def\uy{u_{{y}}}
+\def\uz{u_{{z}}}
+\def\tux{\text{\smaller$\theta_{x}$}}
+\def\tuy{\text{\smaller$\theta_{y}$}}%{\theta_{{y}}}
+\def\tuz{\text{\smaller$\theta_{z}$}}%{\theta_{{z}}}
+
+\def\Lv{\dfInteraction{}_{\LinV}}
+\def\Lw{\dfInteraction{}_{\AngV}}
+\def\Lvx{\dfInteraction{}_{\Vx}}
+\def\Lwx{\dfInteraction{}_{\Wx}}
+\def\Lvy{\dfInteraction{}_{\Vy}}
+\def\Lwy{\dfInteraction{}_{\Wy}}
+\def\Lvz{\dfInteraction{}_{\Vz}}
+\def\Lwz{\dfInteraction{}_{\Wz}}
+
+\providecommand\sinc{\mathop{\operator@font sinc}\nolimits}
+\providecommand\cosc{\mathop{\operator@font cosc}\nolimits}
+\providecommand\mcosc{\mathop{\operator@font mcosc}\nolimits}
+
+
+\DeclareRobustCommand\EError[1][\empty]{\boldsymbol{\varepsilon}\@df@check@empty{#1}{_{(#1)}}}
+\DeclareRobustCommand\dEError[1][\empty]{\iter{\boldsymbol{\varepsilon}}\@df@check@empty{#1}{_{(#1)}}}
+
+\def\EEtild{\tilde{\boldsymbol\varepsilon}}
+\def\EEi{\EError[\Estim{\IntrinP}]}
+\def\EEe{\EError[\Estim{\ExtrinP}]}
+\def\EEie{\EError[\Estim{\IntrinP},\Estim{\ExtrinP}]}
+\def\dEEi{\dEError[\Estim{\IntrinP}]}
+\def\dEEe{\dEError[\Estim{\ExtrinP}]}
+\def\dEEie{\dEError[\Estim{\IntrinP},\Estim{\ExtrinP}]}
+
+\def\stateSz{\psi}%{\Sigma}
+\def\odeF{\varphi}
+
+
+\def\mij{m_{ij}}
+\def\Mbeta{\relax}
+\def\Obj{\mathcal O}
+\def\Region{\mathcal R}%
+
+\def\Apq{A_{pq}}
+\def\primitive{\pi}
+
+
+\def\Combinaison{\mathbf{C}}
+\def\e{\mathbf{e}}
+\def\eTask{\e_\text{task}}
+\def\deTask{\dot{\e}_\text{task}}
+\def\VS{{\text{vs}}}
+\def\evs{\e_\VS}
+
+\def\dotqvs{\dq_{\left(\visualData\right)}}
+
+\DeclareRobustCommand\skewW[1][\empty]{\skew{\AngV[#1]}}
+\DeclareRobustCommand\dfTensorW[2][\Sensor]{\left\{{}_{\scriptscriptstyle\identity_{#2}\otimes}\AngV[#1]\right\}}
+
+\def\vs{\LinV[{\Sensor}]}\def\ws{\AngV[{\Sensor}]}
+\def\ve{\LinV[{\EndEff}]}\def\we{\AngV[{\EndEff}]}
+
+\def\EEr{\EError[{\rot}]}
+\DeclareRobustCommand\JExtR[1]{\frac{\partial#1}{\partial{\ExR}}}
+\def\dR{{}^\Sensor\dot{\Rot}_\EndEff}
+
+\def\EEt{\EError[{\Transl}]}
+\DeclareRobustCommand\JExtT[1]{\frac{\partial#1}{\partial{\ExT}}}
+
+
+\DeclareRobustCommand\Pose{\mathbf{r}}
+
+\def\cRn{\Rot{\Sensor}\EndEff{}}%
+\def\cRnT{\Rot{\Sensor}{\EndEff}^\top}%
+\def\cTn{\Transl{\Sensor}\EndEff{}}%
+\def\cWn{{}^\Sensor\dfTransf_\EndEff}%
+\def\dT{{}^\Sensor\dot{\Transl}_\EndEff}%
+\def\Av{{\mathbf{A}}}
+\def\Bw{{\mathbf{B}}}
+\def\Cw{{\mathbf{C}}}
+\def\K{\mathbf{K}}
+\def\Ka{\K_{11}}
+\def\Kb{\K_{12}}
+\def\Kc{\K_{21}}
+\def\Kd{\K_{22}}
+\def\Kv{{\mathbf{K}}_1}
+\def\Kw{{\mathbf{K}}_2}
+
+\def\ae{\mathbf{a}_{e}}
+\def\ba{\mathbf{b}_{a}}
+\def\bb{\mathbf{b}}
+\def\bw{\mathbf{b}_{\omega}}
+\def\wm{\boldsymbol{\omega}_{m}}
+\def\am{\mathbf{a}_{m}}
+\def\Ja{\mathbf{J}_{a}}
+\def\Jw{\mathbf{J}_{\omega}}
+\def\Jb{\mathbf{J}_{\bb}}
+\def\cg{{}^\Sensor\mathbf{g}}
+\def\ogo{{}^o\mathbf{g}}
+\def\wg{{}^w\mathbf{g}}
+\def\Fw{\Frame{w}}
+\def\Fo{\Frame{o}}
+\def\vg{\LinV[g]}
+\def\vi{\LinV[m]}
+\def\Ot{\mathbf{0}_{3 \times 3}}
+
+% \DeclareRobustCommand\iter[1]{\mathring{#1}}
+\DeclareRobustCommand\iter[1]{\delta {#1}}
+\DeclareRobustCommand\iter[1]{\text{d} {#1}}
+% \DeclareRobustCommand\iter[1]{\dot{#1}}
+\def\Limu{\LInteraction_{\mathbf{g}}}
+% \def\Le{\LInteraction_{\EError}}
+\def\Le{\LInteraction_{\extrin}}
+
+
+% automatique
+\def\iz{z^{-1}}
+\DeclareRobustCommand\izn[1]{z^{-#1}}
+\def\zd{z^d}
+\def\izd{z^{-d}}
+\def\bB{\bar{B}}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\endinput
+%%
+%% End of file `localStyle.sty'.
