@@ -15,9 +15,17 @@
 \usepackage{dirtree}
 \usepackage{enumitem}
 \usepackage[explicit]{titlesec}
+\usepackage{etoolbox}
+
+\makeatletter
+\patchcmd{\ttlh@hang}{\parindent\z@}{\parindent\z@\leavevmode}{}{}
+\patchcmd{\ttlh@hang}{\noindent}{}{}{}
+\makeatother
+
 \fancyhead{}
 \renewcommand{\headrulewidth}{0.pt}
 
 \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 
 \titleformat{\chapter}[display] {\raggedleft\fontsize{14pt}{12pt}\sc}{{\chaptertitlename\ \thechapter}}{0pt}{\raggedleft\bf\Huge #1 \hrule}  
+
