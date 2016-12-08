@@ -1,0 +1,31 @@
+\documentclass{thesisbeamer}
+
+\title[Short title in footline]{The actual and probably very long title of the thesis}
+\author[Name in footline]{Author \newline ~ \newline \normalsize{Advisors: Duh, Dih, Dah}}
+\date{The date}
+
+\bibliography{../biblio}
+
+% video will work on Linux (with Okular) or OS X, for other OS's or viewers find your own way to do it
+\videoOFF
+
+\begin{document}
+
+\MakeTitleNoFoot
+
+\begin{frame}{Introduction}
+\begin{itemize}[<+->]
+\item Some
+\item Appearing
+\item Bullets
+\begin{itemize}
+ \item With sub-bullets
+ \item \fullcite{pythm001}
+\end{itemize}
+
+
+
+\end{itemize}
+\end{frame}
+
+\end{document}

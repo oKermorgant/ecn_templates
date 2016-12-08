@@ -1,0 +1,72 @@
+\documentclass{thesisreport}
+
+
+\begin{document}
+
+ \include{thesisfront}  
+ 
+  \section*{Abstract}
+ 
+ 
+ \newpage
+ 
+ \section*{Acknowledgements}
+ 
+ \newpage
+ 
+ 
+ \section*{Notations}
+ 
+ \newpage
+ 
+ 
+ 
+ \tableofcontents
+ 
+ 
+ \chapter*{Introduction}
+ \addcontentsline{toc}{chapter}{Introduction}	 % non-numbered chapters do not appear in table of contents by default
+ 
+ 
+ \chapter{State of the art}
+ 
+ \section{First topic}
+ 
+ \section{Second topic}
+ 
+ \chapter{Actual work}
+ 
+ When dealing with rectangled triangles I sometimes used this theorem from \cite{pythm001}:
+ \begin{equation}\label{theo}
+  a^2 + b^2 = c^2
+ \end{equation}The demonstration is in Appendix \ref{sec:prooftheorem}.
+
+ 
+ 
+ \chapter{Failed experiments}
+ 
+ \chapter*{Conclusion}
+ \addcontentsline{toc}{chapter}{Conclusion}
+ 
+ 
+ 
+ % switch to A-B-C chaptering
+ \appendix	
+ 
+ \chapter{Proof of theorem \ref{theo}}
+ \label{sec:prooftheorem}
+ 
+ 
+ \begin{proof}
+\eqref{theo} was already demonstrated in \cite{euclides300}.
+\end{proof}
+ 
+ \addcontentsline{toc}{chapter}{Bibliography}
+ \bibliographystyle{IEEEtranS}
+ 
+ \bibliography{../biblio}
+ 
+ 
+ 
+ 
+\end{document}
