@@ -71,6 +71,10 @@
 \setbeamercolor{itemize subitem}{fg=duck,bg=}
 \setbeamercolor{itemize subsubitem}{fg=masterblue,bg=}
 
+% enumerate
+\setbeamercolor{local structure}{fg=darkblue}
+
+
 \def\beamer@entrycode{\vspace*{\baselineskip}}
 \beamertemplatenavigationsymbolsempty
 \hfuzz=10pt
