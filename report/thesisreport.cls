@@ -27,5 +27,5 @@
 
 \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 
-\titleformat{\chapter}[display] {\raggedleft\fontsize{14pt}{12pt}\sc}{{\chaptertitlename\ \thechapter}}{0pt}{\raggedleft\bf\Huge #1 \hrule}  
+\titleformat{\chapter}[display] {\raggedleft\fontsize{14pt}{12pt}\sc}{{\chaptertitlename\ \thechapter}}{5pt}{{\raggedleft\bf\Huge #1} \vspace{5pt}  \hrule}  
 
