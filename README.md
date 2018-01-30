@@ -16,7 +16,4 @@ In the `ieeeexample` folder is the full tex file of a IEEE article with the corr
 
 It will not fully compile on your computer as the figures are not included, but you can find many examples of syntaxes: equations, tables, algorithms, figures and multiple figures.
 
-
-
-
 Feel free to modify the templates and suggest any improvements.
