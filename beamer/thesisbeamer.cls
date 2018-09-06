@@ -124,8 +124,17 @@
 % Maketitle without headline
 \newcommand{\MakeTitleNoFoot}{
 \begin{frame}[plain]
-\placeImage{LogoARIA}{7.7cm}{.2cm}{.2\paperwidth}
+\placeImage{LogoECN}{7.8cm}{.2cm}{.25\paperwidth}
+
+
+\begin{textblock*}{.4\paperwidth}(4.8cm,8.5cm)
+CORO-IMARO Master
+\end{textblock*}
+
+
 \placeImage{LogoEMARO}{8.1cm}{10.cm}{.2\paperwidth}
+
+
  \titlepage
  %\setbeamercovered{transparent}
 \end{frame}
