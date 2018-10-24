@@ -125,15 +125,8 @@
 \newcommand{\MakeTitleNoFoot}{
 \begin{frame}[plain]
 \placeImage{LogoECN}{7.8cm}{.2cm}{.25\paperwidth}
-
-
-\begin{textblock*}{.4\paperwidth}(4.8cm,8.5cm)
-CORO-IMARO Master
-\end{textblock*}
-
-
+\placeImage{LogoIMARO}{8.1cm}{5.cm}{.2\paperwidth}
 \placeImage{LogoEMARO}{8.1cm}{10.cm}{.2\paperwidth}
-
 
  \titlepage
  %\setbeamercovered{transparent}
