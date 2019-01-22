@@ -61,7 +61,6 @@
 
 
 \begin{frame}{Citations}
- 
  \begin{itemize}[<+->]
   \item Should be done with \textbackslash{fullcite}
   \begin{itemize}[<.->]
@@ -77,9 +76,33 @@
    \item Name / Journal name / year / editor (journals)
    \item Carefully check conference name (IEEEexplore)
   \end{itemize}
-
  \end{itemize}
 \end{frame}
+
+\begin{frame}{Equations}
+\begin{itemize}[<+->]
+  \item Have a number if used with \texttt{\textbackslash{begin}\{equation\}}
+  \begin{equation}
+  \forall \phi: \quad \cos ^2 \phi + \sin^2\phi = 1
+  \end{equation}\vfill
+  \item Do not have a number if used with \texttt{\textbackslash{begin}\{equation*\}}
+    \begin{equation*}
+  \forall a, b: \quad (a+b)^2 = a^2 + 2ab + b^2
+  \end{equation*}
+    \item Another useful environment is simply  \texttt{\textbackslash{begin}\{center\}}
+    \begin{center}
+    $\forall a, b: \quad (a-b)^2 = a^2 - 2ab + b^2$
+    \end{center}
+    \begin{itemize}[<+->]
+    \item Probably more suited to slides as we use less equation references
+  \end{itemize} \vfill\vfill   
+  \item Can also be included in the text / bullets
+  \begin{itemize}[<+->]
+    \item $\forall \phi: \quad  (\cos\phi+\sin\phi)^2 = 2\cos\phi\sin\phi + 1$
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
 
 
 \end{document}
