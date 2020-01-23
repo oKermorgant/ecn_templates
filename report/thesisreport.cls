@@ -16,8 +16,10 @@
 \usepackage{enumitem}
 \usepackage[explicit]{titlesec}
 \usepackage{etoolbox}
-\usepackage{natbib}
-\bibliographystyle{plainnat}
+
+
+ \bibliographystyle{IEEEtran}
+ 
 
 \makeatletter
 \patchcmd{\ttlh@hang}{\parindent\z@}{\parindent\z@\leavevmode}{}{}
