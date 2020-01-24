@@ -33,3 +33,4 @@
 
 \titleformat{\chapter}[display] {\raggedleft\fontsize{14pt}{12pt}\sc}{{\chaptertitlename\ \thechapter}}{5pt}{{\raggedleft\bf\Huge #1} \vspace{5pt}  \hrule}  
 
+\renewcommand{\cleardoublepage}{\clearpage}
