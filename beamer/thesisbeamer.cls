@@ -124,9 +124,10 @@
 % Maketitle without headline
 \newcommand{\MakeTitleNoFoot}{
 \begin{frame}[plain]
-\placeImage{LogoECN}{7.8cm}{.2cm}{.25\paperwidth}
-\placeImage{LogoIMARO}{8.1cm}{5.cm}{.2\paperwidth}
-\placeImage{LogoEMARO}{8.1cm}{10.cm}{.2\paperwidth}
+\placeImage{LogoECN}{7.8cm}{.2cm}{.2\paperwidth}
+\placeImage{LogoIMARO}{8.1cm}{4.5cm}{.15\paperwidth}
+\placeImage{LogoEMARO}{8.1cm}{7.5cm}{.15\paperwidth}
+\placeImage{LogoJEMARO}{8.1cm}{10.cm}{.2\paperwidth}
 
  \titlepage
  %\setbeamercovered{transparent}
