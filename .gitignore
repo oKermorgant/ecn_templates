@@ -57,6 +57,8 @@ Thumbs.db
 *.out
 *.snm
 *.toc
+*.lot
+*.lof
 .*lock*
 *.blg
 *.bbl
