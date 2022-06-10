@@ -6,8 +6,7 @@
 
 \RequirePackage[utf8]{inputenc}
 \usepackage[absolute,overlay]{textpos}
-\usepackage{media9}	% Linux videos
-\usepackage{multimedia}	% OS X videos
+\usepackage{multimedia}
 \usepackage{array}
 \usepackage[T1]{fontenc}
 \usepackage{helvet}
@@ -174,6 +173,14 @@
 {
 \movie[poster,loop,showcontrols,width=#3,height=#4]{
 }{#1}
+}
+
+\newcommand{\vidposter}[3]
+{
+\ifthenelse{\equal{#1}{}}
+{% if #1 is empty
+}
+{\includegraphics[width=#2, height=#3]{#1}}% if #1 is not empty
 }
 
 
